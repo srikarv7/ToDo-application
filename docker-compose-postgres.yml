@@ -1,0 +1,79 @@
+version: '3'
+services:
+  flyway:
+    image: flyway/flyway:6.3.1
+    command: -configFiles=/flyway/conf/flyway.config -locations=filesystem:/flyway/sql -connectRetries=60 migrate
+    volumes:
+      - ./sql_versions:/flyway/sql
+      - ./docker-flyway.config:/flyway/conf/flyway.config
+    environment:
+      - FLYWAY_URL=jdbc:postgresql://${Hostname}:${Port}/${DBName}
+      - FLYWAY_USER=${User}
+      - FLYWAY_PASSWORD=${Pass}
+      - FLYWAY_SCHEMAS=${Schema}
+
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:12.2
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DBUser}
+      - POSTGRES_PASSWORD=${DBPass}
+      - POSTGRES_DB=${DBName}
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      # PGADMIN_LISTEN_PORT = 80 
+    ports:
+      - "5050:80"
+
+  application:
+    image: info7205project/app:applicationOpenTelemetry
+    ports:
+      - "8080:8080"
+    environment:
+      OTEL_SERVICE_NAME: service1
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+      OTEL_TRACES_EXPORTER: zipkin
+      OTEL_EXPORTER_ZIPKIN_SERVICE_NAME: service2
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://otel-collector:9411
+      OTEL_INSTRUMENTATION_COMMON_DB_STATEMENT_SANITIZER_ENABLED: false
+    # Jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14250"
+
+  #Zipkin
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - 9411:9411
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      - "55679:55679" # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+      - zipkin-all-in-one
