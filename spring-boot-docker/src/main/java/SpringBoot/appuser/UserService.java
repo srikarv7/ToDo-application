@@ -1,5 +1,7 @@
 package SpringBoot.appuser;
 
+import SpringBoot.Exception.ResourceNotFoundException;
+import SpringBoot.model.UserTable;
 import SpringBoot.registration.token.ConfirmationToken;
 import SpringBoot.registration.token.TokenService;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -70,5 +73,15 @@ public class UserService implements UserDetailsService {
 
     public int enableAppUser(String email) {
         return userTableRepository.enableAppUser(email);
+    }
+
+    public AppUser findAppUserById(Long userId) throws ResourceNotFoundException {
+        AppUser user = userTableRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId" + userId));
+        return user;
+    }
+
+    public List<AppUser> getAllUsers(){
+        return this.userTableRepository.findAll();
     }
 }
