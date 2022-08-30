@@ -6,10 +6,11 @@ import javax.persistence.*;
 import java.util.Set;
 
 
-@Entity
-@Table(name="usertable")
+//@Entity
+//@Table(name="usertable")
 public class UserTable {
 
+/*
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -36,6 +37,8 @@ public class UserTable {
     //add reference to tag. We are primary key
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "tuser", fetch = FetchType.LAZY)
     private Set<Tag> tags;
+
+
 
     public UserTable() {
     }
@@ -97,6 +100,7 @@ public class UserTable {
         isValidated = validated;
     }
 
+
     @JsonManagedReference
     public Set<ToDoList> getLists() {
         return lists;
@@ -114,4 +118,7 @@ public class UserTable {
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
+
+ */
+
 }

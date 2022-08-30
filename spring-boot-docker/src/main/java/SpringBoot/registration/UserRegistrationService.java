@@ -1,9 +1,12 @@
 package SpringBoot.registration;
 
+import SpringBoot.Repository.ListRepository;
 import SpringBoot.appuser.AppUser;
 import SpringBoot.appuser.UserRole;
 import SpringBoot.appuser.UserService;
 import SpringBoot.email.MailSender;
+import SpringBoot.model.CurrentTimeRetreiver;
+import SpringBoot.model.ToDoList;
 import SpringBoot.registration.token.ConfirmationToken;
 import SpringBoot.registration.token.TokenService;
 import lombok.AllArgsConstructor;
@@ -20,6 +23,8 @@ public class UserRegistrationService {
     private final EmailValidation emailValidation;
     private final TokenService tokenService;
     private final MailSender mailSender;
+
+    private final ListRepository listRepository;
 
     public String register(UserRegistrationRequest request) {
         boolean isValidEmail = emailValidation.
@@ -68,6 +73,14 @@ public class UserRegistrationService {
         tokenService.setConfirmedAt(token);
         userService.enableAppUser(
                 confirmationToken.getAppUser().getEmail());
+
+        ToDoList list = new ToDoList();
+        list.setAppUser(confirmationToken.getAppUser());
+        list.setListName("Default list");
+        list.setCreated(CurrentTimeRetreiver.getCurrentTime());
+        list.setUpdated(CurrentTimeRetreiver.getCurrentTime());
+
+        this.listRepository.save(list);
         return "confirmed";
     }
 

@@ -2,7 +2,8 @@ package SpringBoot.controller;
 
 import SpringBoot.Exception.ResourceNotFoundException;
 import SpringBoot.Repository.ListRepository;
-import SpringBoot.Repository.UserRepository;
+import SpringBoot.appuser.AppUser;
+import SpringBoot.appuser.UserTableRepository;
 import SpringBoot.model.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,7 +22,7 @@ public class ListController {
     @Autowired
     private ListRepository listRepository;
     @Autowired
-    private UserRepository userRepository;
+    private UserTableRepository userTableRepository;
 
 
     @ApiOperation(value = "Create a list", notes = "Creates a list for the user")
@@ -32,12 +33,12 @@ public class ListController {
     @PostMapping("/")
     public ToDoList addList(@RequestBody AddListRequest addListRequest) throws ResourceNotFoundException {
 
-        UserTable user = userRepository.findById(addListRequest.getUserId())
+        AppUser user = userTableRepository.findById(addListRequest.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+
                         addListRequest.getUserId()));
 
         ToDoList list = new ToDoList();
-        list.setGuser(user);
+        list.setAppUser(user);
         list.setListName(addListRequest.getListName());
         list.setCreated(CurrentTimeRetreiver.getCurrentTime());
         list.setUpdated(CurrentTimeRetreiver.getCurrentTime());
@@ -101,6 +102,5 @@ public class ListController {
 
         return list.getTasks();
     }
-
 
 }

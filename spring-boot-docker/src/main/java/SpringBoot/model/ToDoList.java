@@ -1,5 +1,6 @@
 package SpringBoot.model;
 
+import SpringBoot.appuser.AppUser;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -24,10 +25,15 @@ public class ToDoList {
 
     @Column(name = "updated_at")
     Timestamp updated;
-
+/*
     @ManyToOne
     @JoinColumn(name = "userid",nullable=false)
     private UserTable guser;
+
+ */
+    @ManyToOne
+    @JoinColumn(name = "userid",nullable=false)
+    private AppUser appUser;
 
     //reference to Task table
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "toDoList", fetch = FetchType.LAZY)
@@ -76,7 +82,7 @@ public class ToDoList {
     public void setUpdated(Timestamp updated) {
         this.updated = updated;
     }
-
+/*
     @JsonBackReference
     public UserTable getGuser() {
         return guser;
@@ -84,6 +90,16 @@ public class ToDoList {
 
     public void setGuser(UserTable guser) {
         this.guser = guser;
+    }
+ */
+
+    @JsonBackReference
+    public AppUser getAppUser() {
+        return appUser;
+    }
+
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
     }
 
     @JsonManagedReference

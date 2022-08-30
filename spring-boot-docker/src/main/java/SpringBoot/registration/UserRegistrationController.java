@@ -3,8 +3,7 @@ package SpringBoot.registration;
 import SpringBoot.Exception.ResourceNotFoundException;
 import SpringBoot.appuser.AppUser;
 import SpringBoot.appuser.UserService;
-import SpringBoot.model.ToDoList;
-import SpringBoot.model.UserTable;
+import SpringBoot.model.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -60,12 +59,40 @@ public class UserRegistrationController {
     })
     @GetMapping("/getLists/user/{userId}")
     public Set<ToDoList> getListsByUser(@PathVariable(value = "userId") Long userId) throws ResourceNotFoundException {
-        UserTable user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+userId));
-
-        return user.getLists();
+        return this.userService.getListsByUser(userId);
     }
 
+    @ApiOperation(value = "Create a tag", notes = "Creates a tag for the user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Tag creation Successfull"),
+            @ApiResponse(code = 404, message = "Unable to retreive the user id")
+    })
+    @PostMapping("/tag")
+    public Tag addTag(@RequestBody AddTagRequest addTagRequest) throws ResourceNotFoundException {
 
+        return this.userService.addTag(addTagRequest);
+    }
+
+    @ApiOperation(value = "Rename a tag", notes = "Renames a tag for to the user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Tag renaming Successfull"),
+            @ApiResponse(code = 404, message = "Unable to retreive the tagId")
+    })
+    @PutMapping("/renameTag/{tagId}/tagName/{name}")
+    public Tag renameTag(@PathVariable(value = "tagId") Long tagId,
+                         @PathVariable(value = "name") String tagName) throws ResourceNotFoundException {
+
+        return this.userService.renameTag(tagId,tagName);
+    }
+
+    @ApiOperation(value = "Get all tags for user", notes = "Returns the list of all tags created by this user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved"),
+            @ApiResponse(code = 404, message = "Not found - unable to fetch user")
+    })
+    @GetMapping("/Tags/{userId}")
+    public Set<Tag> getAllTags(@PathVariable(value = "userId") Long userId) throws ResourceNotFoundException {
+        return this.userService.getAllTags(userId);
+    }
 
 }

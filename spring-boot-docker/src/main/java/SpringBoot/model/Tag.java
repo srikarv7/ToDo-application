@@ -1,5 +1,6 @@
 package SpringBoot.model;
 
+import SpringBoot.appuser.AppUser;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
@@ -19,10 +20,14 @@ public class Tag {
 
     @Column(name = "created_at")
     Timestamp created;
-
+/*
     @ManyToOne
     @JoinColumn(name = "userid",nullable=false)
     private UserTable tuser;
+ */
+    @ManyToOne
+    @JoinColumn(name = "userid",nullable=false)
+    private AppUser tappUser;
 
     public Tag() {
     }
@@ -56,7 +61,7 @@ public class Tag {
     public void setCreated(Timestamp created) {
         this.created = created;
     }
-
+/*
     @JsonBackReference
     public UserTable getTuser() {
         return tuser;
@@ -64,5 +69,15 @@ public class Tag {
 
     public void setTuser(UserTable tuser) {
         this.tuser = tuser;
+    }
+ */
+
+    @JsonBackReference
+    public AppUser getTappUser() {
+        return tappUser;
+    }
+
+    public void setTappUser(AppUser tappUser) {
+        this.tappUser = tappUser;
     }
 }

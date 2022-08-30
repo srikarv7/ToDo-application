@@ -1,7 +1,8 @@
 package SpringBoot.appuser;
 
 import SpringBoot.Exception.ResourceNotFoundException;
-import SpringBoot.model.UserTable;
+import SpringBoot.Repository.TagRepository;
+import SpringBoot.model.*;
 import SpringBoot.registration.token.ConfirmationToken;
 import SpringBoot.registration.token.TokenService;
 import lombok.AllArgsConstructor;
@@ -10,9 +11,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,6 +30,8 @@ public class UserService implements UserDetailsService {
     private final UserTableRepository userTableRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final TokenService tokenService;
+
+    private final TagRepository tagRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email)
@@ -84,4 +91,43 @@ public class UserService implements UserDetailsService {
     public List<AppUser> getAllUsers(){
         return this.userTableRepository.findAll();
     }
+
+    public Set<ToDoList> getListsByUser(Long userId) throws ResourceNotFoundException {
+        AppUser user = userTableRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+userId));
+
+        return user.getLists();
+    }
+
+    public Tag addTag(AddTagRequest addTagRequest) throws ResourceNotFoundException {
+
+        AppUser user = userTableRepository.findById(addTagRequest.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+
+                        addTagRequest.getUserId()));
+
+        Tag tag = new Tag();
+        tag.setCreated(CurrentTimeRetreiver.getCurrentTime());
+        tag.setTappUser(user);
+        tag.setName(addTagRequest.getName());
+
+        return this.tagRepository.save(tag);
+    }
+
+    public Tag renameTag(Long tagId,
+                         String tagName) throws ResourceNotFoundException {
+
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+
+                        tagId));
+
+        tag.setName(tagName);
+        return this.tagRepository.save(tag);
+    }
+
+    public Set<Tag> getAllTags(Long userId) throws ResourceNotFoundException {
+        AppUser user = userTableRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("The user not found with userId"+userId));
+        return user.getTags();
+    }
+
 }

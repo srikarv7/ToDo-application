@@ -1,5 +1,8 @@
 package SpringBoot.appuser;
 
+import SpringBoot.model.Tag;
+import SpringBoot.model.ToDoList;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,6 +35,12 @@ public class AppUser implements UserDetails {
     private UserRole userRole;
     private Boolean locked = false;
     private Boolean enabled = false;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "appUser", fetch = FetchType.LAZY)
+    private Set<ToDoList> lists;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "tappUser", fetch = FetchType.LAZY)
+    private Set<Tag> tags;
 
     public AppUser(String firstName,
                    String lastName,
@@ -87,5 +97,23 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @JsonManagedReference
+    public Set<ToDoList> getLists() {
+        return lists;
+    }
+
+    public void setLists(Set<ToDoList> lists) {
+        this.lists = lists;
+    }
+
+    @JsonManagedReference
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 }

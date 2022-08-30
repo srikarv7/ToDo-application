@@ -1,24 +1,10 @@
 package SpringBoot.controller;
 
-import SpringBoot.Exception.ResourceNotFoundException;
-import SpringBoot.Repository.ListRepository;
-import SpringBoot.Repository.TagRepository;
-import SpringBoot.Repository.UserRepository;
-import SpringBoot.model.*;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
-
-@RestController
-@RequestMapping("/v1/user")
-@ApiOperation("User/Tag registration/access API")
+//@RestController
+//@RequestMapping("/v1/user")
+//@ApiOperation("User/Tag registration/access API")
 public class UserController {
+    /*
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -183,4 +169,6 @@ public class UserController {
         return user.getTags();
     }
 
+
+     */
 }
